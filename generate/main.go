@@ -15,6 +15,9 @@
 //go:build ignore
 // +build ignore
 
+//go:generate go run main.go genfile
+//go:generate go run main.go clear
+
 package main
 
 import (
@@ -25,11 +28,11 @@ import (
 )
 
 const (
-	bootGoFile        = "../enterprise/boot.go"
+	bootGoFile        = "../../boot-enterprise.go"
 	bootGoFileContent = `
-package enterprise
+package extensions
 
-import _ "github.com/pingcap/tidb/test-enterprise"
+import _ "github.com/pingcap/tidb/extensions/enterprise"
 `
 )
 

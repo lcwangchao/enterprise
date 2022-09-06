@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:generate go run generate/generate.go genfile
-//go:generate go run generate/generate.go clear
-
-package test_enterprise
+package enterprise
 
 import (
 	"fmt"
