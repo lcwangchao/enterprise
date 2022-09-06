@@ -30,6 +30,9 @@ import (
 const (
 	bootGoFile        = "../../boot-enterprise.go"
 	bootGoFileContent = `
+//go:build enterprise
+// +build enterprise
+
 package extensions
 
 import _ "github.com/pingcap/tidb/extensions/enterprise"
