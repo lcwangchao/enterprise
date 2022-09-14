@@ -15,9 +15,19 @@
 package enterprise
 
 import (
-	"fmt"
+	"github.com/pingcap/tidb/extensions"
+	"github.com/pingcap/tidb/parser/terror"
 )
 
+const ExtensionName = "demo"
+
 func init() {
-	fmt.Println("We can do some thing here to load enterprise codes")
+	err := extensions.Register(
+		ExtensionName,
+		extensions.WithHandleCommand(handleCommand),
+		extensions.WithHandleConnect(func() (extensions.ConnHandler, error) {
+			return &connHandler{}, nil
+		}),
+	)
+	terror.MustNil(err)
 }

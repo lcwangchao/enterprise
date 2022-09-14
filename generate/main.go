@@ -28,12 +28,12 @@ import (
 )
 
 const (
-	bootGoFile        = "../../boot-enterprise.go"
-	bootGoFileContent = `
+	loadGoFile        = "../../load/load-enterprise.go"
+	loadGoFileContent = `
 //go:build enterprise
 // +build enterprise
 
-package extensions
+package load
 
 import _ "github.com/pingcap/tidb/extensions/enterprise"
 `
@@ -54,11 +54,11 @@ func main() {
 	}
 
 	if doClear {
-		err := os.Remove(bootGoFile)
+		err := os.Remove(loadGoFile)
 		if !os.IsNotExist(err) {
 			terror.MustNil(err)
 		}
 	} else {
-		terror.MustNil(os.WriteFile(bootGoFile, []byte(bootGoFileContent), 0644))
+		terror.MustNil(os.WriteFile(loadGoFile, []byte(loadGoFileContent), 0644))
 	}
 }
