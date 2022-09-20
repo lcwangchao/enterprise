@@ -1,0 +1,22 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "enterprise",
+    srcs = [
+        "cmd.go",
+        "conn.go",
+        "enterprise.go",
+    ],
+    importpath = "github.com/pingcap/tidb/extensions/enterprise",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//extensions",
+        "//parser/ast",
+        "//parser/mysql",
+        "//parser/terror",
+        "//sessionctx/variable",
+        "//util/chunk",
+        "@com_github_pingcap_log//:log",
+        "@org_uber_go_zap//:zap",
+    ],
+)
