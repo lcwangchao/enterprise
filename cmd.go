@@ -44,7 +44,7 @@ func (h *auditCmdHandler) BuildOutputSchema(addColumn func(tableName string, nam
 }
 
 func (h *auditCmdHandler) ExecuteCmd(ctx extensions.CmdContext, chk *chunk.Chunk) error {
-	if !ctx.GetPrivilegeManager().RequestDynamicVerificationWithUser(CustomPriv, false, ctx.GetUser()) {
+	if !ctx.RequestDynamicVerificationWithUser(CustomPriv, false, ctx.GetUser()) {
 		return extensions.ErrSpecificAccessDenied.GenWithStackByArgs("CUSTOM_PRIV or SUPER")
 	}
 

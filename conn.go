@@ -25,7 +25,7 @@ import (
 
 type connHandler struct{}
 
-func (h *connHandler) CreateConnEventListener() extensions.ConnEventListener {
+func (h *connHandler) ConnEventListener() extensions.ConnEventListener {
 	return h
 }
 
@@ -60,7 +60,7 @@ func (h *connHandler) OnConnEvent(tp extensions.ConnEventTp, conn *variable.Conn
 	)
 }
 
-func (h *connHandler) CreateStmtEventListener() extensions.StmtEventListener {
+func (h *connHandler) StmtEventListener() extensions.StmtEventListener {
 	return h
 }
 
