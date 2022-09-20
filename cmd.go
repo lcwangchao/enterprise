@@ -15,8 +15,6 @@
 package enterprise
 
 import (
-	"context"
-
 	"github.com/pingcap/tidb/extensions"
 	"github.com/pingcap/tidb/parser/ast"
 	"github.com/pingcap/tidb/parser/mysql"
@@ -40,15 +38,37 @@ func (h *auditCmdHandler) OutputColumnsNum() int {
 }
 
 func (h *auditCmdHandler) BuildOutputSchema(addColumn func(tableName string, name string, tp byte, size int)) {
-	addColumn("", "COL1", mysql.TypeLonglong, 4)
-	addColumn("", "COL2", mysql.TypeVarchar, 64)
+	addColumn("", "row", mysql.TypeLonglong, 4)
+	addColumn("", "name", mysql.TypeVarchar, 64)
+	addColumn("", "val", mysql.TypeVarchar, 128)
 }
 
-func (h *auditCmdHandler) ExecuteCmd(_ context.Context, chk *chunk.Chunk) error {
+func (h *auditCmdHandler) ExecuteCmd(ctx extensions.CmdContext, chk *chunk.Chunk) error {
+	if !ctx.GetPrivilegeManager().RequestDynamicVerificationWithUser(CustomPriv, false, ctx.GetUser()) {
+		return extensions.ErrSpecificAccessDenied.GenWithStackByArgs("CUSTOM_PRIV or SUPER")
+	}
+
+	seValue, err := ctx.GetSessionOrGlobalSystemVar(CustomVar)
+	if err != nil {
+		return err
+	}
+
+	gValue, err := ctx.GetGlobalSysVar(CustomVar)
+	if err != nil {
+		return err
+	}
+
 	chk.AppendInt64(0, 1)
-	chk.AppendString(1, "row1")
+	chk.AppendString(1, "extension")
+	chk.AppendString(2, ExtensionName)
 
 	chk.AppendInt64(0, 2)
-	chk.AppendString(1, "row2")
+	chk.AppendString(1, "@@session."+CustomVar)
+	chk.AppendString(2, seValue)
+
+	chk.AppendInt64(0, 3)
+	chk.AppendString(1, "@@global."+CustomVar)
+	chk.AppendString(2, gValue)
+
 	return nil
 }

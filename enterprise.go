@@ -17,13 +17,28 @@ package enterprise
 import (
 	"github.com/pingcap/tidb/extensions"
 	"github.com/pingcap/tidb/parser/terror"
+	"github.com/pingcap/tidb/sessionctx/variable"
 )
 
 const ExtensionName = "demo"
 
+const CustomPriv = "CUSTOM_PRIV"
+const CustomVar = "tidb_custom_sys_var"
+
 func init() {
 	err := extensions.Register(
 		ExtensionName,
+		extensions.WithDynamicPrivileges([]string{
+			CustomPriv,
+		}),
+		extensions.WithSysVariables([]*variable.SysVar{
+			{
+				Name:  CustomVar,
+				Value: "ON",
+				Scope: variable.ScopeGlobal | variable.ScopeSession,
+				Type:  variable.TypeBool,
+			},
+		}),
 		extensions.WithHandleCommand(handleCommand),
 		extensions.WithHandleConnect(func() (extensions.ConnHandler, error) {
 			return &connHandler{}, nil

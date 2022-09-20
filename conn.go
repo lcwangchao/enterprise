@@ -19,6 +19,7 @@ import (
 
 	"github.com/pingcap/log"
 	"github.com/pingcap/tidb/extensions"
+	"github.com/pingcap/tidb/sessionctx/variable"
 	"go.uber.org/zap"
 )
 
@@ -28,11 +29,11 @@ func (h *connHandler) CreateConnEventListener() extensions.ConnEventListener {
 	return h
 }
 
-func (h *connHandler) OnConnEvent(event *extensions.ConnEvent) {
+func (h *connHandler) OnConnEvent(tp extensions.ConnEventTp, conn *variable.ConnectionInfo) {
 	var name string
-	switch event.Tp {
-	case extensions.ConnEstablished:
-		name = "ConnEstablished"
+	switch tp {
+	case extensions.Connected:
+		name = "Connected"
 	case extensions.ConnAuthenticated:
 		name = "ConnAuthenticated"
 	case extensions.ConnRejected:
@@ -42,20 +43,20 @@ func (h *connHandler) OnConnEvent(event *extensions.ConnEvent) {
 	case extensions.ConnDisconnect:
 		name = "ConnDisconnect"
 	default:
-		name = fmt.Sprintf("%v", event.Tp)
+		name = fmt.Sprintf("%v", tp)
 	}
 
 	log.Info(name,
-		zap.Uint64("ConnectionID", event.ConnectionID),
-		zap.String("ConnectionType", event.ConnectionType),
-		zap.String("ClientIP", event.ClientIP),
-		zap.String("ClientPort", event.ClientPort),
-		zap.Int("ServerID", event.ServerID),
-		zap.Int("ServerPort", event.ServerPort),
-		zap.String("User", event.User),
-		zap.String("ClientVersion", event.ClientVersion),
-		zap.String("SSLVersion", event.SSLVersion),
-		zap.String("DB", event.DB),
+		zap.Uint64("ConnectionID", conn.ConnectionID),
+		zap.String("ConnectionType", conn.ConnectionType),
+		zap.String("ClientIP", conn.ClientIP),
+		zap.String("ClientPort", conn.ClientPort),
+		zap.Int("ServerID", conn.ServerID),
+		zap.Int("ServerPort", conn.ServerPort),
+		zap.String("User", conn.User),
+		zap.String("ClientVersion", conn.ClientVersion),
+		zap.String("SSLVersion", conn.SSLVersion),
+		zap.String("DB", conn.DB),
 	)
 }
 
@@ -63,28 +64,28 @@ func (h *connHandler) CreateStmtEventListener() extensions.StmtEventListener {
 	return h
 }
 
-func (h *connHandler) OnStmtEvent(event *extensions.StmtEvent) {
+func (h *connHandler) OnStmtEvent(tp extensions.StmtEventTp, stmt extensions.StmtEventContext) {
 	var name string
-	switch event.Tp {
+	switch tp {
 	case extensions.StmtParserError:
 		name = "StmtParserError"
 	case extensions.StmtStart:
 		name = "StmtStart"
 	case extensions.StmtEnd:
-		if event.StmtContext.Error() != nil {
+		if stmt.Error() != nil {
 			name = "StmtError"
 		} else {
 			name = "StmtSuccess"
 		}
 	default:
-		name = fmt.Sprintf("%v", event.Tp)
+		name = fmt.Sprintf("%v", tp)
 	}
 
-	normalized, _ := event.StmtDigest()
+	normalized, _ := stmt.StmtDigest()
 	log.Info(name,
-		zap.Uint64("ConnectionID", event.Conn.ConnectionID),
-		zap.String("OriginalSQL", event.OriginalSQL()),
-		zap.Strings("ExecuteArgs", event.StmtArguments()),
+		zap.Uint64("ConnectionID", stmt.GetConnectionInfo().ConnectionID),
+		zap.String("OriginalSQL", stmt.OriginalSQL()),
+		zap.Strings("ExecuteArgs", stmt.StmtArguments()),
 		zap.String("NormalizedSQL", normalized),
 	)
 }
