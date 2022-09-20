@@ -25,6 +25,10 @@ import (
 
 type connHandler struct{}
 
+func NewConnHandler() (extensions.ConnHandler, error) {
+	return &connHandler{}, nil
+}
+
 func (h *connHandler) ConnEventListener() extensions.ConnEventListener {
 	return h
 }

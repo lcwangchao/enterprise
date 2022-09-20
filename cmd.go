@@ -21,16 +21,11 @@ import (
 	"github.com/pingcap/tidb/util/chunk"
 )
 
-func handleCommand(stmt ast.ExtensionCmdNode) (extensions.ExtensionCmdHandler, error) {
-	switch stmt.(type) {
-	case *ast.AuditCmdStmt:
-		return &auditCmdHandler{}, nil
-	default:
-		return nil, nil
-	}
+type auditCmdHandler struct {
 }
 
-type auditCmdHandler struct {
+func NewAuditCmdHandler(_ *ast.AuditCmdStmt) (*auditCmdHandler, error) {
+	return &auditCmdHandler{}, nil
 }
 
 func (h *auditCmdHandler) OutputColumnsNum() int {

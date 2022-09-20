@@ -16,6 +16,7 @@ package enterprise
 
 import (
 	"github.com/pingcap/tidb/extensions"
+	"github.com/pingcap/tidb/parser/ast"
 	"github.com/pingcap/tidb/parser/terror"
 	"github.com/pingcap/tidb/sessionctx/variable"
 )
@@ -39,10 +40,15 @@ func init() {
 				Type:  variable.TypeBool,
 			},
 		}),
-		extensions.WithHandleCommand(handleCommand),
-		extensions.WithHandleConnect(func() (extensions.ConnHandler, error) {
-			return &connHandler{}, nil
+		extensions.WithHandleCommand(func(n ast.ExtensionCmdNode) (extensions.ExtensionCmdHandler, error) {
+			switch stmt := n.(type) {
+			case *ast.AuditCmdStmt:
+				return NewAuditCmdHandler(stmt)
+			default:
+				return nil, nil
+			}
 		}),
+		extensions.WithHandleConnect(NewConnHandler),
 	)
 	terror.MustNil(err)
 }
