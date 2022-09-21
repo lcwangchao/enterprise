@@ -48,7 +48,7 @@ func init() {
 				return nil, nil
 			}
 		}),
-		extensions.WithHandleConnect(NewConnHandler),
+		extensions.WithHandleConnect(HandleConn),
 	)
 	terror.MustNil(err)
 }

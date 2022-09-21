@@ -23,17 +23,17 @@ import (
 	"go.uber.org/zap"
 )
 
-type connHandler struct{}
+type connListener struct{}
 
-func NewConnHandler() (extensions.ConnHandler, error) {
-	return &connHandler{}, nil
+func HandleConn() (*extensions.ConnHandler, error) {
+	l := &connListener{}
+	return &extensions.ConnHandler{
+		ConnEventListener: l,
+		StmtEventListener: l,
+	}, nil
 }
 
-func (h *connHandler) ConnEventListener() extensions.ConnEventListener {
-	return h
-}
-
-func (h *connHandler) OnConnEvent(tp extensions.ConnEventTp, conn *variable.ConnectionInfo) {
+func (l *connListener) OnConnEvent(tp extensions.ConnEventTp, conn *variable.ConnectionInfo) {
 	var name string
 	switch tp {
 	case extensions.Connected:
@@ -64,11 +64,7 @@ func (h *connHandler) OnConnEvent(tp extensions.ConnEventTp, conn *variable.Conn
 	)
 }
 
-func (h *connHandler) StmtEventListener() extensions.StmtEventListener {
-	return h
-}
-
-func (h *connHandler) OnStmtEvent(tp extensions.StmtEventTp, stmt extensions.StmtEventContext) {
+func (l *connListener) OnStmtEvent(tp extensions.StmtEventTp, stmt extensions.StmtEventContext) {
 	var name string
 	switch tp {
 	case extensions.StmtParserError:
