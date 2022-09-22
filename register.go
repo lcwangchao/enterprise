@@ -26,7 +26,7 @@ const ExtensionName = "demo"
 const CustomPriv = "CUSTOM_PRIV"
 const CustomVar = "tidb_custom_sys_var"
 
-func init() {
+func Register() {
 	err := extensions.Register(
 		ExtensionName,
 		extensions.WithDynamicPrivileges([]string{

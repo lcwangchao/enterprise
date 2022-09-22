@@ -35,7 +35,11 @@ const (
 
 package load
 
-import _ "github.com/pingcap/tidb/extensions/enterprise"
+import "github.com/pingcap/tidb/extensions/enterprise"
+
+func init() {
+	enterprise.Register()
+}
 `
 )
 
