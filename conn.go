@@ -25,8 +25,7 @@ import (
 
 type connListener struct{}
 
-func HandleConn() (*extensions.ConnHandler, error) {
-	l := &connListener{}
+func (l *connListener) HandleConn() (*extensions.ConnHandler, error) {
 	return &extensions.ConnHandler{
 		ConnEventListener: l,
 		StmtEventListener: l,

@@ -27,12 +27,17 @@ const CustomPriv = "CUSTOM_PRIV"
 const CustomVar = "tidb_custom_sys_var"
 
 func Register() {
-	err := extensions.Register(
+	terror.MustNil(extensions.Register(CreateExtension))
+}
+
+func CreateExtension() (*extensions.ExtensionManifest, error) {
+	listener := &connListener{}
+	return extensions.NewExtension(
 		ExtensionName,
-		extensions.WithDynamicPrivileges([]string{
+		extensions.WithNewDynamicPrivileges([]string{
 			CustomPriv,
 		}),
-		extensions.WithSysVariables([]*variable.SysVar{
+		extensions.WithNewSysVariables([]*variable.SysVar{
 			{
 				Name:  CustomVar,
 				Value: "ON",
@@ -48,7 +53,6 @@ func Register() {
 				return nil, nil
 			}
 		}),
-		extensions.WithHandleConnect(HandleConn),
-	)
-	terror.MustNil(err)
+		extensions.WithHandleConnect(listener.HandleConn),
+	), nil
 }
